@@ -39,6 +39,18 @@ YoutubePlayer.prototype = {
       }.bind(this));
   },
 
+  play: function() {
+    this._player.playVideo();
+  },
+
+  pause: function() {
+    this._player.pauseVideo();
+  },
+
+  seekTo: function(second) {
+    this._player.seekTo(second);
+  },
+
   _loadYoutubeApi: function() {
     var script = document.createElement('script');
     script.src = "https://www.youtube.com/iframe_api";

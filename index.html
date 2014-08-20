@@ -7,6 +7,12 @@
     <link rel="import" href="youtube-player.html">
   </head>
   <body>
-    <youtube-player videoid="VoLUvE-ny1k"></youtube-player>
+    <youtube-player id="youtubePlayer" videoid="VoLUvE-ny1k"></youtube-player>
+    <script>
+      var youtubePlayer = document.querySelector('#youtubePlayer');
+      youtubePlayer.addEventListener('ready', function() {
+        youtubePlayer.play();
+      });
+    </script>
   </body>
 </html>
