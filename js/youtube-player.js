@@ -39,6 +39,10 @@ YoutubePlayer.prototype = {
       }.bind(this));
   },
 
+  load: function(videoId) {
+    this._player.loadVideoById(videoId);
+  },
+
   play: function() {
     this._player.playVideo();
   },
