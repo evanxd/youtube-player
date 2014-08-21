@@ -1,91 +1,89 @@
-var youtubePlayerDocument = document._currentScript.ownerDocument;
+(function(window, document) {
+  var youtubePlayerDocument = document._currentScript.ownerDocument;
 
-function YoutubePlayer() {}
+  function YoutubePlayer() {}
 
-YoutubePlayer.prototype = {
-  __proto__: HTMLElement.prototype,
+  YoutubePlayer.prototype = {
+    __proto__: HTMLElement.prototype,
 
-  _player: null,
+    _player: null,
 
-  _shadowRoot: null,
+    _shadowRoot: null,
 
-  _videoId: null,
+    _videoId: null,
 
-  set videoId(videoid) {
-    this._videoId = videoid;
-  },
+    get videoId() {
+      return this._videoId;
+    },
 
-  get videoId() {
-    return this._videoId;
-  },
+    get currentTime() {
+      return this._player.getCurrentTime();
+    },
 
-  get currentTime() {
-    return this._player.getCurrentTime();
-  },
+    createdCallback: function() {
+      var template = youtubePlayerDocument.querySelector('#youtube-player').content;
+      this._shadowRoot = this.createShadowRoot();
+      this._shadowRoot.appendChild(document.importNode(template, true));
 
-  createdCallback: function() {
-    var template = youtubePlayerDocument.querySelector('#youtube-player').content;
-    this._shadowRoot = this.createShadowRoot();
-    this._shadowRoot.appendChild(document.importNode(template, true));
+      this._videoId = this.hasAttribute('videoid') ?
+        this.getAttribute('videoid') :
+        'VoLUvE-ny1k';
 
-    this.videoId = this.hasAttribute('videoid') ?
-      this.getAttribute('videoid') :
-      'VoLUvE-ny1k';
+      this._loadYoutubeApi();
+      youtubePlayerDocument.addEventListener('youtubeiframeapiready',
+        function() {
+          this._createPlayer();
+        }.bind(this));
+    },
 
-    this._loadYoutubeApi();
-    youtubePlayerDocument.addEventListener('youtubeiframeapiready',
-      function() {
-        this._createPlayer();
-      }.bind(this));
-  },
+    load: function(videoId) {
+      this._player.loadVideoById(videoId);
+    },
 
-  load: function(videoId) {
-    this._player.loadVideoById(videoId);
-  },
+    play: function() {
+      this._player.playVideo();
+    },
 
-  play: function() {
-    this._player.playVideo();
-  },
+    pause: function() {
+      this._player.pauseVideo();
+    },
 
-  pause: function() {
-    this._player.pauseVideo();
-  },
+    seekTo: function(second) {
+      this._player.seekTo(second);
+    },
 
-  seekTo: function(second) {
-    this._player.seekTo(second);
-  },
+    _loadYoutubeApi: function() {
+      var script = document.createElement('script');
+      script.src = "https://www.youtube.com/iframe_api";
+      this._shadowRoot.appendChild(script);
+    },
 
-  _loadYoutubeApi: function() {
-    var script = document.createElement('script');
-    script.src = "https://www.youtube.com/iframe_api";
-    this._shadowRoot.appendChild(script);
-  },
+    _createPlayer: function() {
+      this._player = new YT.Player('player', {
+        videoId: this.videoId,
+        events: {
+          onReady: function(event) {
+            this.dispatchEvent(new CustomEvent('ready', {
+              detail: event
+            }));
+          }.bind(this),
+          onStateChange: function(event) {
+            this.dispatchEvent(new CustomEvent('statechange', {
+              detail: event
+            }));
+          }.bind(this)
+        }
+      });
+    }
+  };
 
-  _createPlayer: function() {
-    this._player = new YT.Player('player', {
-      videoId: this.videoId,
-      events: {
-        onReady: function(event) {
-          this.dispatchEvent(new CustomEvent('ready', {
-            detail: event
-          }));
-        }.bind(this),
-        onStateChange: function(event) {
-          this.dispatchEvent(new CustomEvent('statechange', {
-            detail: event
-          }));
-        }.bind(this)
-      }
-    });
-  }
-};
+  window.onYouTubeIframeAPIReady = function() {
+    youtubePlayerDocument.dispatchEvent(
+      new CustomEvent('youtubeiframeapiready')
+    );
+  };
 
-function onYouTubeIframeAPIReady() {
-  youtubePlayerDocument.dispatchEvent(
-    new CustomEvent('youtubeiframeapiready')
-  );
-}
-
-document.register('youtube-player', {
-  prototype: YoutubePlayer.prototype
-});
+  document.register('youtube-player', {
+    prototype: YoutubePlayer.prototype
+  });
+})(window, document);
