@@ -10,9 +10,12 @@
     <youtube-player id="youtubePlayer" videoid="VoLUvE-ny1k"></youtube-player>
     <script>
       var youtubePlayer = document.querySelector('#youtubePlayer');
-      youtubePlayer.addEventListener('ready', function() {
+      youtubePlayer.onready = function() {
         youtubePlayer.play();
-      });
+      };
+      youtubePlayer.onstatechange = function(e) {
+        console.log('state: ' + e.data);
+      };
     </script>
   </body>
 </html>

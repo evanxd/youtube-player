@@ -66,11 +66,13 @@
             this.dispatchEvent(new CustomEvent('ready', {
               detail: event
             }));
+            this.onready && this.onready(event);
           }.bind(this),
           onStateChange: function(event) {
             this.dispatchEvent(new CustomEvent('statechange', {
               detail: event
             }));
+            this.onstatechange && this.onstatechange(event);
           }.bind(this)
         }
       });
