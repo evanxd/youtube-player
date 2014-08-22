@@ -12,6 +12,8 @@
 
     _videoId: null,
 
+    state: null,
+
     get videoId() {
       return this._videoId;
     },
@@ -76,6 +78,7 @@
           }.bind(this)
         }
       });
+      this.state = YT.PlayerState;
     }
   };
 
